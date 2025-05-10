@@ -1,0 +1,30 @@
+# Use the official Python image based on Alpine
+FROM python:3.13-alpine
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Install system dependencies
+RUN apk add --no-cache gcc musl-dev libffi-dev postgresql-dev git
+
+# Set the working directory
+WORKDIR /app
+
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Copy requirements file
+COPY poetry.lock pyproject.toml /app/
+
+# Copy the application code
+COPY . /app/
+
+RUN chmod +x /app/entrypoint.sh
+
+EXPOSE 8000
+
+ENTRYPOINT ["sh", "/app/entrypoint.sh"]
+
+# Command to run the application
+# CMD ["tail", "-f", "/dev/null"]
+CMD ["poetry", "run", "gunicorn", "django_prog.django_prog.wsgi:application", "--bind", "0.0.0.0:8000"]
