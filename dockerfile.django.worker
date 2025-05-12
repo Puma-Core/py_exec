@@ -27,4 +27,4 @@ ENTRYPOINT ["sh", "/app/entrypoint.sh"]
 
 # Command to run the application
 # CMD ["tail", "-f", "/dev/null"]
-CMD ["poetry", "run", "gunicorn", "django_prog.django_prog.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["poetry", "run", "gunicorn", "django_prog.wsgi:application", "--bind", "0.0.0.0:8000"]

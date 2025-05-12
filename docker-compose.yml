@@ -26,7 +26,7 @@ services:
       - db
     environment:
       DEBUG: "1"
-      DJANGO_SETTINGS_MODULE: django_prog.django_prog.settings
+      DJANGO_SETTINGS_MODULE: django_prog.settings
       DATABASE_URL: postgres://your_user:your_password@db:5432/your_database
 
 volumes:

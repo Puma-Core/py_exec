@@ -17,7 +17,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 os.environ.setdefault(
     'DJANGO_SETTINGS_MODULE',
-    'django_prog.django_prog.settings',
+    'django_prog.settings',
 )
 
 # Quick-start development settings - unsuitable for production
@@ -53,7 +53,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'django_prog.django_prog.urls'
+ROOT_URLCONF = 'django_prog.urls'
 
 TEMPLATES = [
     {

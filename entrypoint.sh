@@ -18,7 +18,7 @@ poetry install --no-root
 echo "PostgreSQL started"
 
 # Ejecutar migraciones
-poetry run python django_prog/manage.py migrate
+poetry run python manage.py migrate
 
 # Ejecutar el comando que se pase como argumento
 exec "$@"
