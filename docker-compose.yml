@@ -5,9 +5,9 @@ services:
     image: postgres:15
     container_name: puma_db
     environment:
-      POSTGRES_USER: your_user
-      POSTGRES_PASSWORD: your_password
-      POSTGRES_DB: your_database
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -26,8 +26,7 @@ services:
       - db
     environment:
       DEBUG: "1"
-      DJANGO_SETTINGS_MODULE: django_prog.settings
-      DATABASE_URL: postgres://your_user:your_password@db:5432/your_database
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
 
 volumes:
   postgres_data:
