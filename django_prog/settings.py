@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-ug)6^$1u@x_%39-ea1u$oq9vkw+gjqwu&=*o1!jz&!4g162!v0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS: list[str] = ["*"]
 
 
 # Application definition
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_ace',
     'django_prog.script'
 ]
 
@@ -128,3 +129,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+CELERY_BROKER_URL = 'redis://redis/0'
+CELERY_RESULT_BACKEND = 'redis://redis/0'

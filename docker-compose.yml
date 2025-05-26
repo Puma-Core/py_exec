@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   db:
     image: postgres:15
@@ -16,7 +14,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: dockerfile.django.worker
+      dockerfile: dockerfile.django
     container_name: puma_backend
     volumes:
       - .:/app:rw
@@ -27,6 +25,30 @@ services:
     environment:
       DEBUG: "1"
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+
+  redis:
+    image: redis:7-alpine
+    container_name: puma_redis
+    ports:
+      - "6379:6379"
+    depends_on:
+      - db
+      - backend
+  
+  worker:
+    container_name: puma_worker
+    build:
+      context: .
+      dockerfile: dockerfile.django.worker
+    volumes:
+      - .:/app:rw
+    depends_on:
+      - db
+      - redis
+    environment:
+      DEBUG: "1"
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379/0
 
 volumes:
   postgres_data:
