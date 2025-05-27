@@ -10,6 +10,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - puma_network
 
   backend:
     build:
@@ -25,6 +27,8 @@ services:
     environment:
       DEBUG: "1"
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    networks:
+      - puma_network
 
   redis:
     image: redis:7-alpine
@@ -34,7 +38,9 @@ services:
     depends_on:
       - db
       - backend
-  
+    networks:
+      - puma_network
+
   worker:
     container_name: puma_worker
     build:
@@ -49,6 +55,29 @@ services:
       DEBUG: "1"
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       REDIS_URL: redis://redis:6379/0
+    networks:
+      - puma_network
+
+  python_sandbox:
+    build:
+      context: .
+      dockerfile: dockerfile.sandbox
+    container_name: puma_sandbox
+    working_dir: /app
+    environment:
+      - DEBUG=1
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - redis
+      - backend
+    networks:
+      - puma_network
+    ports:
+      - "5555:5555"
+      - "5556:5556"
 
 volumes:
   postgres_data:
+
+networks:
+  puma_network:

@@ -1,5 +1,6 @@
 from django.db import models
-
+from django_prog.task.script import run_script
+from aiohttp import ClientSession
 
 class Script(models.Model):
     name = models.CharField(max_length=255)
@@ -10,7 +11,6 @@ class Script(models.Model):
     def __str__(self):
         return self.name
 
-    def save_script(self, name, content):
-        self.name = name
-        self.content = content
-        self.save()
+    def save(self):
+        run_script.delay(script_code=self.content, )
+        super().save()
