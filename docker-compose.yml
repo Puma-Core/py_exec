@@ -58,24 +58,6 @@ services:
     networks:
       - puma_network
 
-  python_sandbox:
-    build:
-      context: .
-      dockerfile: dockerfile.sandbox
-    container_name: puma_sandbox
-    working_dir: /app
-    environment:
-      - DEBUG=1
-      - PYTHONUNBUFFERED=1
-    depends_on:
-      - redis
-      - backend
-    networks:
-      - puma_network
-    ports:
-      - "5555:5555"
-      - "5556:5556"
-
 volumes:
   postgres_data:
 
