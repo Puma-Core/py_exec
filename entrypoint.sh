@@ -33,6 +33,7 @@ if [ -f "pyproject.toml" ]; then
     .venv/bin/poetry install --no-root
 fi
 
+
 echo "PostgreSQL started"
 
 # Ejecutar migraciones usando el virtual environment

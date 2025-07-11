@@ -13,6 +13,19 @@ services:
     networks:
       - puma_network
 
+  emkc:
+    image: ghcr.io/engineer-man/piston/api:latest
+    container_name: puma_emkc
+    ports:
+      - "8001:2000"
+    networks:
+      - puma_network
+    privileged: true
+    volumes:
+      - piston_packages:/piston/packages
+    tmpfs:
+      - /tmp:exec
+
   backend:
     build:
       context: .
@@ -24,6 +37,7 @@ services:
       - "8000:8000"
     depends_on:
       - db
+      - emkc
     environment:
       DEBUG: "1"
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
@@ -60,6 +74,7 @@ services:
 
 volumes:
   postgres_data:
+  piston_packages:
 
 networks:
   puma_network:
