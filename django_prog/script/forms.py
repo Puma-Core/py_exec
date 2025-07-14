@@ -54,15 +54,10 @@ class WorkflowForm(forms.ModelForm):
         fields = ['name', 'description']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'description': forms.Textarea(
+                attrs={
+                    'class': 'form-control',
+                    'rows': 3
+                }
+            ),
         }
-
-
-WorkflowScriptFormSet = inlineformset_factory(
-    Workflow,
-    WorkflowScript,
-    form=WorkflowScriptForm,
-    extra=1,  # Formularios extra vacíos
-    can_delete=True,
-    can_order=False,
-)

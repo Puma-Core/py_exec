@@ -2,6 +2,6 @@ from django.contrib import admin
 from django_prog.script.models import WorkflowScript
 
 
-class WorkflowScriptInline(admin.TabularInline):
+class WorkflowScriptInline(admin.StackedInline):
     model = WorkflowScript
     extra = 1

@@ -1,7 +1,7 @@
 from django.contrib import admin
-from django.db import models
 from django_prog.script.forms import ScriptForm, WorkflowForm
 from django_prog.script.models import Script, Workflow, WorkflowScript
+from django_prog.script.script_inline import WorkflowScriptInline
 
 
 @admin.register(Script)
@@ -10,12 +10,6 @@ class ScriptAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_filter = ('created_at', 'updated_at')
     form = ScriptForm
-
-
-class WorkflowScriptInline(admin.StackedInline):
-    model = WorkflowScript
-    extra = 1
-
 
 @admin.register(Workflow)
 class WorkflowAdmin(admin.ModelAdmin):
