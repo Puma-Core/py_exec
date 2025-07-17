@@ -1,5 +1,6 @@
 from django_prog.celery import app
 from pistonpy import PistonApp
+import json
 
 python_app = PistonApp()
 
