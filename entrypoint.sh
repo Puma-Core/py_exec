@@ -20,11 +20,11 @@ echo "Activating virtual environment and installing dependencies..."
 # Activar virtual environment y ejecutar comandos dentro de él
 .venv/bin/python -m pip install --upgrade pip
 
-# Si usas requirements.txt
-if [ -f "requirements.txt" ]; then
-    echo "Installing requirements from requirements.txt..."
-    .venv/bin/pip install -r requirements.txt
-fi
+# # Si usas requirements.txt
+# if [ -f "requirements.txt" ]; then
+#     echo "Installing requirements from requirements.txt..."
+#     .venv/bin/pip install -r requirements.txt
+# fi
 
 # Si usas poetry
 if [ -f "pyproject.toml" ]; then
@@ -37,8 +37,8 @@ fi
 echo "PostgreSQL started"
 
 # Ejecutar migraciones usando el virtual environment
-echo "Running migrations..."
-.venv/bin/python manage.py migrate
+# echo "Running migrations..."
+# .venv/bin/python manage.py migrate
 
 echo "Starting the application..."
 exec "$@"

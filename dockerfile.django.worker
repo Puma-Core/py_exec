@@ -1,28 +1,57 @@
-# Use the official Python image based on Alpine
 FROM python:3.13-alpine
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
 # Install system dependencies
-RUN apk add --no-cache gcc musl-dev libffi-dev postgresql-dev git
+RUN apk add --no-cache \
+    build-base \
+    postgresql-dev \
+    gcc \
+    musl-dev \
+    libffi-dev \
+    openssl-dev \
+    cargo \
+    rust
 
-# Set the working directory
+# Create non-root user
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
+
 WORKDIR /app
 
+# Create virtual environment
+RUN python -m venv .venv
 ENV PATH="/app/.venv/bin:$PATH"
 
-# Copy requirements file
-COPY poetry.lock pyproject.toml /app/
+# Install pip and setuptools first
+RUN pip install --upgrade pip setuptools wheel
 
-# Copy the application code
-COPY . /app/
+# Copy requirements first (if you have them)
+COPY requirements.txt* ./
 
-RUN chmod +x /app/entrypoint.sh
+# Install Python dependencies with timeout and retries
+RUN pip install --timeout 300 --retries 3 \
+    django \
+    celery \
+    redis \
+    django-ninja \
+    django-ace \
+    psycopg2-binary \
+    pistonpy
 
-EXPOSE 8000
+# Install poetry with timeout
+RUN pip install --timeout 300 --retries 3 poetry
 
-ENTRYPOINT ["sh", "/app/entrypoint.sh"]
+# Copy the rest of the application
+COPY . .
 
+# Change ownership of the app directory to appuser
+RUN chown -R appuser:appgroup /app
+
+# Switch to non-root user
+USER appuser
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV DJANGO_SETTINGS_MODULE=django_prog.settings
+
+# Run worker as non-root user
 CMD ["celery", "-A", "django_prog", "worker", "--loglevel=info"]
