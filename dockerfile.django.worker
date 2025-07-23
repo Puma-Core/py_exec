@@ -1,19 +1,23 @@
-FROM python:3.13-alpine
+FROM python:3.13-slim
 
 # Install system dependencies
-RUN apk add --no-cache \
-    build-base \
-    postgresql-dev \
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
     gcc \
-    musl-dev \
+    libc6-dev \
     libffi-dev \
-    openssl-dev \
+    libssl-dev \
     cargo \
-    rust
+    netcat-openbsd \
+    rustc \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
 
 # Create non-root user
-RUN addgroup -g 1001 -S appgroup && \
-    adduser -u 1001 -S appuser -G appgroup
+RUN addgroup --gid 1001 appgroup && \
+    adduser --uid 1001 --gid 1001 --disabled-password --gecos "" appuser
 
 WORKDIR /app
 
@@ -35,10 +39,8 @@ RUN pip install --timeout 300 --retries 3 \
     django-ninja \
     django-ace \
     psycopg2-binary \
-    pistonpy
-
-# Install poetry with timeout
-RUN pip install --timeout 300 --retries 3 poetry
+    pistonpy \
+    poetry
 
 # Copy the rest of the application
 COPY . .
@@ -54,4 +56,5 @@ ENV PYTHONPATH=/app
 ENV DJANGO_SETTINGS_MODULE=django_prog.settings
 
 # Run worker as non-root user
+# CMD ["tail", "-f", "/dev/null"]
 CMD ["celery", "-A", "django_prog", "worker", "--loglevel=info"]
