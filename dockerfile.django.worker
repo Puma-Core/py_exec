@@ -32,7 +32,7 @@ RUN pip install --upgrade pip setuptools wheel
 COPY requirements.txt* ./
 
 # Install Python dependencies with timeout and retries
-RUN pip install --timeout 300 --retries 3 \
+RUN pip install \
     django \
     celery \
     redis \
@@ -57,4 +57,4 @@ ENV DJANGO_SETTINGS_MODULE=django_prog.settings
 
 # Run worker as non-root user
 # CMD ["tail", "-f", "/dev/null"]
-CMD ["celery", "-A", "django_prog", "worker", "--loglevel=info"]
+CMD ["/app/.venv/bin/celery", "-A", "django_prog", "worker", "--loglevel=info"]

@@ -6,18 +6,25 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     networks:
       - puma_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   emkc:
     image: ghcr.io/engineer-man/piston/api:latest
     container_name: puma_emkc
+    platform: linux/amd64
     ports:
-      - "8001:2000"
+      - "${EMKC_PORT:-8001}:2000"
     networks:
       - puma_network
     privileged: true
@@ -34,10 +41,12 @@ services:
     volumes:
       - .:/app:rw
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8000}:8000"
     depends_on:
-      - db
-      - emkc
+      db:
+        condition: service_healthy
+      # emkc:
+      #   condition: service_started
     environment:
       DEBUG: "1"
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
@@ -48,13 +57,14 @@ services:
     image: redis:7-alpine
     container_name: puma_redis
     ports:
-      - "6379:6379"
-    depends_on:
-      - db
-      - emkc
-      - backend
+      - "${REDIS_PORT:-6379}:6379"
     networks:
       - puma_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   worker:
     container_name: puma_worker
@@ -64,8 +74,10 @@ services:
     volumes:
       - .:/app:rw
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       DEBUG: "1"
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
