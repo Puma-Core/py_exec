@@ -21,26 +21,24 @@ RUN addgroup --gid 1001 appgroup && \
 
 WORKDIR /app
 
-# Create virtual environment
-RUN python -m venv .venv
-ENV PATH="/app/.venv/bin:$PATH"
-
 # Install pip and setuptools first
 RUN pip install --upgrade pip setuptools wheel
 
-# Copy requirements first (if you have them)
-COPY requirements.txt* ./
+# Copy requirements first (poetry files)
+COPY pyproject.toml poetry.lock ./
 
-# Install Python dependencies with timeout and retries
+# Install Python dependencies directly from pyproject.toml
 RUN pip install \
-    django \
-    celery \
-    redis \
-    django-ninja \
-    django-ace \
-    psycopg2-binary \
-    pistonpy \
-    poetry
+    django==5.2.4 \
+    celery==5.5.2 \
+    redis==6.1.0 \
+    django-ninja==1.4.3 \
+    django-ace==1.39.2 \
+    psycopg2-binary==2.9.9 \
+    pistonpy==0.0.3 \
+    gunicorn==23.0.0 \
+    watchdog==4.0.2 \
+    && pip list | grep watchdog
 
 # Copy the rest of the application
 COPY . .
@@ -55,6 +53,7 @@ USER appuser
 ENV PYTHONPATH=/app
 ENV DJANGO_SETTINGS_MODULE=django_prog.settings
 
-# Run worker as non-root user
+# Run worker as non-root user with watchdog auto-restart
 # CMD ["tail", "-f", "/dev/null"]
-CMD ["/app/.venv/bin/celery", "-A", "django_prog", "worker", "--loglevel=info"]
+# Alternative without watchdog: CMD ["celery", "-A", "django_prog", "worker", "--loglevel=info"]
+CMD ["/bin/bash", "-c", "python -c 'import watchdog; print(\"Watchdog imported successfully\")' && python -m watchdog.watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery -A django_prog worker --loglevel=info"]

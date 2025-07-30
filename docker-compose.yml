@@ -32,6 +32,8 @@ services:
       - piston_packages:/piston/packages
     tmpfs:
       - /tmp:exec
+    environment:
+      - PISTON_LOG_LEVEL=INFO
 
   backend:
     build:
