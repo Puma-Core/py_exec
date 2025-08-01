@@ -17,12 +17,10 @@ class ScriptAdmin(PumaAdminModel):
     list_filter = ('created_at', 'updated_at')
     form = ScriptForm
 
-    def btn__run(self, request, object_id=None, form_url='', extra_context=None):
+    def btn__run(self, request, object_id, form_url='', extra_context=None):
         script_admin = self.get_object(request, object_id)
         run_script.delay(script_code=script_admin.content)
-        return self.change_view(
-            request, object_id, form_url, extra_context
-        )
+        return redirect(request.path)
 
 @admin.register(Workflow)
 class WorkflowAdmin(admin.ModelAdmin):
