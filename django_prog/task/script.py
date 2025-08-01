@@ -5,7 +5,6 @@ import json
 python_app = PistonApp()
 
 
-
 @app.task(name='check_runtimes')
 def check_runtimes():
     """

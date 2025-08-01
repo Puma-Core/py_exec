@@ -1,7 +1,7 @@
 from typing import Any, Callable, Self
 from django.contrib import admin
 from django.urls import path
-    
+from django_prog.common.func import replace_prefix_list    
 
 list_routes = [
     path(
@@ -15,7 +15,6 @@ class PumaAdminModel(admin.ModelAdmin):
     """
     Base model for Puma Admin with common fields.
     """
-    change_form_template = 'admin/common/change_form.html'
     _prefix_btn_md = "btn__"
 
     def get_btn_methods(self) -> list[str]:
@@ -41,12 +40,32 @@ class PumaAdminModel(admin.ModelAdmin):
         ]
         return url_paths
 
-    def get_urls(self: Self) -> Any:
-        urls = super().get_urls() + self.build_btn_paths()
-        return urls
-
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if extra_context is None:
             extra_context = {}
-        extra_context["btn_methods"] = self.get_btn_methods()
+        extra_context["btn_methods"] = replace_prefix_list(
+            self.get_btn_methods(),
+            self._prefix_btn_md
+        )
         return super().change_view(request, object_id, form_url, extra_context)
+
+    def get_urls(self: Self) -> Any:
+        urls = super().get_urls() + self.build_btn_paths()
+        return urls
+    
+    def response_change(self, request, obj):
+        """
+        Override to handle custom button actions.
+        """
+
+        method_name = next(
+            (
+                k for k in request.POST.keys()
+                if k.startswith(self._prefix_btn_md)
+            ),
+            None
+        )
+
+        if method_name and hasattr(self, method_name):
+            return getattr(self, method_name)(request, obj.pk)
+        return super().response_change(request, obj)

@@ -27,11 +27,6 @@ class Script(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        run_script.delay(script_code=self.content)
-        super().save(*args, **kwargs)
-
-
 class WorkflowScript(models.Model):
     workflow = models.ForeignKey(Workflow, on_delete=models.CASCADE)
     script = models.ForeignKey(Script, on_delete=models.CASCADE)
