@@ -1,4 +1,3 @@
-import traceback
 from typing import Any
 from requests import Session
 from django_prog.integrations.env_script.interfaces import ENVInterface
@@ -32,8 +31,6 @@ class PistonIntegration(ENVInterface):
         }
         try:
             full_url = f"{self.piston_api}/{self.Endpoints.Execute}"
-            print(f"Sending request to: {full_url}")
-            print(f"Payload: {payload}")
             
             response = self.session.post(
                 url=full_url,
@@ -41,19 +38,10 @@ class PistonIntegration(ENVInterface):
                 timeout=30
             )
             
-
-            print(f"Response status: {response.status_code}")
-            print(f"Response headers: {dict(response.headers)}")
-            
-            if response.status_code != 200:
-                print(f"Response content: {response.text}")
-            
             response.raise_for_status()
             result = response.json()
-            print(f"Response JSON: {result}")
             return result
         except Exception as e:
-            traceback.print_exc()
             print(f"Error running code: {e}")
             return {"error": str(e)}
 
@@ -63,20 +51,13 @@ class PistonIntegration(ENVInterface):
         """
         try:
             full_url = f"{self.piston_api}/{self.Endpoints.Runtimes}"
-            print(f"Getting runtimes from: {full_url}")
             
             response = self.session.get(url=full_url, timeout=30)
-            print(f"Runtimes response status: {response.status_code}")
-            
-            if response.status_code != 200:
-                print(f"Runtimes response content: {response.text}")
             
             response.raise_for_status()
             runtimes = response.json()
-            print(f"Available runtimes: {runtimes}")
             return runtimes
         except Exception as e:
-            traceback.print_exc()
             print(f"Error getting runtimes: {e}")
             return []
         

@@ -1,5 +1,4 @@
 from typing import Any
-from httpcore import URL
 from requests import Session
 
 from django_prog.integrations.env_script.interfaces import ENVInterface

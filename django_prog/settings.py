@@ -137,3 +137,5 @@ STATICFILES_DIRS = [
 
 CELERY_BROKER_URL = 'redis://redis/0'
 CELERY_RESULT_BACKEND = 'redis://redis/0'
+
+PISTON_DOMAIN = os.getenv('PISTON_DOMAIN', 'http://puma_emkc:2000')

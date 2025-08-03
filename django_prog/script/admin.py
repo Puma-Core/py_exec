@@ -4,8 +4,6 @@ from django_prog.common.admin import PumaAdminModel
 from django_prog.script.forms import ScriptForm, WorkflowForm
 from django_prog.script.models import Script, Workflow
 from django_prog.script.script_inline import WorkflowScriptInline
-from django.utils.safestring import mark_safe
-import json
 
 from django_prog.task.script import run_script
 
